@@ -3,6 +3,7 @@
 */
 #include<vector>
 #include<string>
+#include<stack>
 #include<unordered_set>
 
 using namespace std;
@@ -22,6 +23,29 @@ int maxLength(vector<int>& arr) {
         }
         res = max(res, i - left + 1);
         set.insert(arr[i]);
+    }
+    return res;
+}
+
+/*
+补充：滑动窗口最大值
+维护一个双端队列，用来存储滑动窗口中可能出现的最大值，
+当新的元素比队尾元素大时，将队尾元素移除，直到队列为空，
+或新元素不大于队尾元素，将新元素加入到队尾，
+这样做的原因是当前的最大元素可能会由于滑动窗口的改变而失效，新的元素依旧有机会成为窗口内的最大元素。
+*/
+vector<int> maxInWindows(vector<int>& num, unsigned int size)
+{
+    vector<int> res;
+    deque<int> dq;
+    for(int i = 0; i < num.size(); ++i){
+        while(!dq.empty() && num[dq.back()] < num[i])
+            dq.pop_back();
+        dq.push_back(i);
+        if(dq.front() == i - size)
+            dq.pop_front();
+        if(i >=  size - 1)
+            res.push_back(num[dq.front()]);
     }
     return res;
 }
@@ -152,9 +176,8 @@ sum=22，
 [5,8,9]
 ]
 */
-vector<vector<int>> res;
+vector<vector<int> > res;
 vector<int> path;
-
 void backtracking(TreeNode* root, int sum){
     if(root == nullptr) return;
     path.push_back(root -> val);
@@ -167,7 +190,7 @@ void backtracking(TreeNode* root, int sum){
     path.pop_back();
 }
 
-vector<vector<int>> pathSum(TreeNode* root, int sum){
+vector<vector<int> > pathSum(TreeNode* root, int sum){
     backtracking(root, sum);
     return res;
 }
@@ -238,6 +261,38 @@ bool isValid(string s){
     return st.empty();
 }
 
+
+/*
+8、岛屿数量
+DFS 感染，只要是1的，都赋给0，一个个遍历
+*/
+
+void dfs(vector<vector<char> >& grid, int i, int j) {
+    int row = grid.size();
+    int column = grid[0].size();
+    grid[i][j] = '0';
+    if (i - 1 >= 0 && grid[i-1][j] == '1') dfs(grid, i - 1, j);
+    if (i + 1 < row && grid[i+1][j] == '1') dfs(grid, i + 1, j);
+    if (j - 1 >= 0 && grid[i][j-1] == '1') dfs(grid, i, j - 1);
+    if (j + 1 < column && grid[i][j+1] == '1') dfs(grid, i, j + 1);
+}
+
+int numIslands(vector<vector<char> >& grid) {
+    int row = grid.size();
+    if (row == 0) return 0;
+    int column = grid[0].size();
+
+    int res = 0;
+    for (int i = 0; i < row; ++i) {
+        for (int j = 0; j < column; ++j) {
+            if (grid[i][j] == '1') {
+                ++res;
+                dfs(grid, i, j);
+            }
+        }
+    }
+    return res;
+}
 
 
 
