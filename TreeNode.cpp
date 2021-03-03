@@ -104,7 +104,7 @@ public:
             int cursize = q.size();
             vector<int> vec;
             for(int i = 0; i < cursize; i++){
-                auto node = q.front();
+                TreeNode* node = q.front();
                 q.pop();
                 vec.push_back(node -> val);
                 if(node -> left) q.push(node -> left);
@@ -115,6 +115,33 @@ public:
         return res;
     }
 };
+
+/*
+二叉树的镜像
+*/
+class Solution{
+public:
+    TreeNode* mirror(TreeNode* root){
+        if(root == nullptr) return root;
+        swap(root -> left, root -> right);
+        mirror(root -> left);
+        mirror(root -> right);
+        return root;
+    }
+    TreeNode* mirrorTree(TreeNode* root) {
+        stack<TreeNode*> st;
+        if(root==NULL) return root;
+        st.push(root);
+        while(!st.empty()){
+            TreeNode* node = st.top();
+            st.pop();
+            if(node -> left) st.push(node -> left);
+            if(node -> right) st.push(node -> right);
+            swap(node -> left, node -> right);
+        }
+        return root;
+    }
+}
 
 /*
 二叉树的最大深度

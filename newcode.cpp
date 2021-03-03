@@ -9,7 +9,7 @@
 using namespace std;
 /*
 tag: 哈希、双指针、字符串  滑动窗口
-1.给定一个数组arr，返回arr的最长无重复子串的长度(无重复指的是所有数字都不相同)。
+给定一个数组arr，返回arr的最长无重复子串的长度(无重复指的是所有数字都不相同)。
 */
 
 int maxLength(vector<int>& arr) {
@@ -51,7 +51,7 @@ vector<int> maxInWindows(vector<int>& num, unsigned int size)
 }
 
 /*
-2.k个一组翻转链表
+k个一组翻转链表
 将给出的链表中的节点每 k 个一组翻转，返回翻转后的链表
 如果链表中的节点数不是 k 的倍数，将最后剩下的节点保持原样
 你不能更改节点中的值，只能更改节点本身。
@@ -95,7 +95,7 @@ public:
         ListNode* pre = nullptr;
         ListNode* cur = head;
         while(cur){
-            auto node = cur -> next;
+            ListNode* node = cur -> next;
             cur -> next = pre;
             pre = cur;
             cur = node;
@@ -106,7 +106,11 @@ public:
 };
 
 /*
-3.最近公共祖先
+
+*/
+
+/*
+最近公共祖先
 
 最近公共祖先和o1,o2有三种关系：
 
@@ -241,7 +245,7 @@ public:
 };
 
 /*
-7.括号序列
+7.括号序列  栈的操作
 利用栈 一个个括号来匹配，只要匹配到了就弹出
 */
 bool isValid(string s){
@@ -263,8 +267,8 @@ bool isValid(string s){
 
 
 /*
-8、岛屿数量
-DFS 感染，只要是1的，都赋给0，一个个遍历
+8、岛屿数量  DFS
+深度遍历去感染，只要是1的，都赋给0，一个个遍历
 */
 
 void dfs(vector<vector<char> >& grid, int i, int j) {
@@ -293,6 +297,99 @@ int numIslands(vector<vector<char> >& grid) {
     }
     return res;
 }
+
+/*
+双指针
+接雨水问题    
+认为如果一端有更高的条形块（例如右端），积水的高度依赖于当前方向的高度（从左到右）。
+当我们发现另一侧（右侧）的条形块高度不是最高的，我们则开始从相反的方向遍历（从右到左）。
+我们必须在遍历时维护 left_max 和 right_max ，
+可以使用两个指针交替进行，实现 1 次遍历即可完成。
+
+*/
+int trap(vector<int>& height) {
+    int left = 0, right = height.size() - 1;
+    int leftmax = 0, rightmax = 0;
+    int res;
+    while(left < right){
+        leftmax = max(leftmax, height[left]);
+        rightmax = max(rightmax, height[right]);
+        if(leftmax < rightmax ){
+            res += leftmax - height[left];
+            left++;
+        }else{
+            res += rightmax - height[right];
+            right--;
+        }
+    }
+    return res;
+}
+
+/*
+动态规划
+编辑距离 较难
+dp[i][j] 表示的是 word1中前i个字符，变换到word2中前j个字符所需要操作的次数
+考虑边界条件，word1为空或者word2为空的情况
+转移条件：
+增：dp[i][j] = dp[i - 1][j] + 1;
+删：dp[i][j] = dp[i][j + 1] + 1;
+改：dp[i][j] = dp[i - 1][j - 1] + 1;
+如果word1[i - 1] == word2[j - 1] dp[i][j] =min(dp[i-1][j-1],dp[i][j]);
+
+*/
+
+int minDistance(string word1, string word2){
+    int m = word1.size();
+    int n = word2.size();
+    vector<vector<int> > dp(m + 1, vector<int>(n + 1, 0));
+    for(int i = 0; i <= m; i++){
+        dp[i][0] = i; 
+    }
+    for(int j = 0; j <= n; j++){
+        dp[0][j] = j;
+    }
+    for(int i = 1; i <= m; i++){
+        for(int j = 1; j <= n; j++){
+            dp[i][j] = min(dp[i-1][j-1], min(dp[i-1][j],dp[i][j-1])) + 1;
+            if(word1[i-1] == word2[j-1]){
+                dp[i][j] = min(dp[i][j], dp[i-1][j-1]);
+            }
+        }
+    }
+    return dp[m][n];
+}
+
+/*
+动态规划  中等
+目标和
+给定一个非负整数数组，a1, a2, ..., an, 和一个目标数 S。
+现在你有两个符号 + 和 -。对于数组中的任意一个整数，你都可以从 + 或 - 中选择一个符号添加在前面。
+返回可以使最终数组和为目标数 S 的所有添加符号的方法数。
+
+转化为0-1背包问题
+假设加法的总和为x，那么减法对应的总和就是sum - x。
+所以我们要求的是 x - (sum - x) = S
+x = (S + sum) / 2
+数组为候选集，X为背包容量
+*/
+
+int findTargetSumWays(vector<int>& nums, int S) {
+    int sum = 0;
+    for (int i = 0; i < nums.size(); i++){
+        sum += nums[i];
+    }        
+    if (S > sum || (S + sum) % 2 == 1) return 0;   // 此时没有方案
+    int target = (S + sum) / 2;
+    vector<int> dp(target + 1, 0);
+    dp[0] = 1;
+    for (int i = 0; i < nums.size(); i++) {
+        for (int j = target; j >= nums[i]; j--){     //0-1背包倒序遍历
+            dp[j] += dp[j - nums[i]];    
+        }
+    }
+    return dp[target];
+}
+
 
 
 
