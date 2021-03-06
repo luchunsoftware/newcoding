@@ -95,8 +95,8 @@ public:
 */
 class Solution{
 public:
-    vector<vector<int>> levelorder(TreeNode* root){
-        vector<vector<int>> res;
+    vector<vector<int> > levelorder(TreeNode* root){
+        vector<vector<int> > res;
         if(root == nullptr) return res;
         queue<TreeNode*> q;
         q.push(root);
@@ -115,6 +115,24 @@ public:
         return res;
     }
 };
+
+/*
+对称二叉树   从顶至底递归，判断每对节点是否对称，从而判断树是否为对称二叉树
+判断一棵二叉树是不是对称的。如果一棵二叉树和它的镜像一样，那么它是对称的。
+*/
+class Solution{
+public:
+    bool isSymmetric(TreeNode* root){
+        if(root == nullptr) return true;
+        return compare(root -> left, root -> right);
+    }
+    bool compare(TreeNode* p, TreeNode* q){
+        if(p == nullptr && q == nullptr) return true;
+        if(p == nullptr || q == nullptr || p -> val != q -> val) return false;
+        return compare(p -> left, q -> right) && compare(p -> right, q -> left);
+    }
+};
+
 
 /*
 二叉树的镜像

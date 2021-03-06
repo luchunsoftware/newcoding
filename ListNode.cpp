@@ -1,4 +1,5 @@
 #include<vector>
+#include<stack>
 
 using namespace std;
 
@@ -7,7 +8,7 @@ struct ListNode{
     ListNode* next;
     ListNode() : val(0), next(nullptr) {}
     ListNode(int x) : val(x), next(nullptr) {}
-    ListNode(int x, ListNode *next) : val(x), next(next) {}
+    ListNode(int x, ListNode* next) : val(x), next(next) {}
 };
 
 
@@ -20,7 +21,7 @@ public:
         ListNode* pre = nullptr;
         ListNode* cur = head;
         while(cur){
-            auto node = cur -> next;
+            ListNode* node = cur -> next;
             cur -> next = pre;
             pre = cur;
             cur = node;
@@ -157,6 +158,48 @@ public:
             l2 -> next = mergeTwoLists(l1, l2 -> next);
             return l2;
         }
+    }
+};
+
+/*
+栈先存储，逐个相加，cnt储存进位
+两个链表生成相加链表
+假设链表中每一个节点的值都在 0 - 9 之间，那么链表整体就可以代表一个整数。
+给定两个这种链表，请生成代表两个整数相加值的结果链表。
+例如：链表 1 为 9->3->7，链表 2 为 6->3，最后生成新的结果链表为 1->0->0->0。
+*/
+class Solution {
+public:
+
+    ListNode* addInList(ListNode* head1, ListNode* head2) {
+        stack<int> st1, st2;
+        while(head1){
+            st1.push(head1 -> val);
+            head1 = head1 -> next;
+        }
+        while(head2){
+            st2.push(head2 -> val);
+            head2 = head2 -> next;
+        }
+        int cnt = 0;  //存储进位
+        ListNode* res = nullptr;
+        while(!st1.empty() || !st2.empty()){
+            int x1 = st1.empty() ? 0 : st1.top();
+            int x2 = st2.empty() ? 0 : st2.top();
+            if(!st1.empty()) st1.pop();
+            if(!st2.empty()) st2.pop();
+            int sum = x1 + x2 + cnt;
+            cnt = sum / 10;
+            ListNode* node = new ListNode(sum % 10);
+            node -> next = res;
+            res = node;
+        }
+        if(cnt > 0){
+            ListNode* node = new ListNode(cnt);
+            node -> next = res;
+            res = node;
+        }
+        return res;
     }
 };
 

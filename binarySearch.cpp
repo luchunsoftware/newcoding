@@ -99,7 +99,6 @@ public:
             int mid = left + ((right - left) >> 1);
             if (nums[mid] == target)
                 return mid;
-            
             // 只要在普通的二分查找判断语句中加一层 && 来确定目标值所在的区间，即可以同样O(logn)的复杂度查找
             if (nums[left] <= nums[mid] && (nums[left] <= target && target < nums[mid]))
                 right = mid - 1;
@@ -119,11 +118,6 @@ NC32 求平方根，向下取整
 */
 class Solution {
 public:
-    /**
-     * 
-     * @param x int整型 
-     * @return int整型
-     */
     int sqrt(int x) {
         int left = 0, right = x, res = -1;
         while (left <= right) { 
@@ -138,6 +132,37 @@ public:
         return res;
     }
 };
+
+/*
+数值的整数次方  采用二分的思路，时间复杂度n(logn)
+实现函数double Power(double base, int exponent)，求base的exponent次方。
+不得使用库函数，同时不需要考虑大数问题。
+*/
+class Solution{
+public:
+    double power(double x, int n){
+        if(x == 0) return 0;
+        long m = n;
+        double res = 1;
+        if(m < 0){
+            x = 1 / x;
+            m = -m;
+        }
+        while(m > 0){
+            if(m % 2 == 1) res *= x;
+            m /= 2;
+            x *= x;
+        }
+        return res;
+    }
+};
+
+/*
+0 ~ n-1 中 缺失的数字
+一个长度为n-1的递增排序数组中的所有数字都是唯一的，
+并且每个数字都在范围0～n-1之内。在范围0～n-1内的n个数字中有且只有一个数字不在该数组中，请找出这个数字。
+
+*/
 
 
 

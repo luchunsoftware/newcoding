@@ -51,6 +51,30 @@ vector<int> maxInWindows(vector<int>& num, unsigned int size)
 }
 
 /*
+数组中次数超过一半的数字
+数组中有一个数字出现的次数超过数组长度的一半，请找出这个数字。例如输入一个长度为9的数组{1,2,3,2,2,2,5,4,2}。
+由于数字2在数组中出现了5次，超过数组长度的一半，因此输出2。如果不存在则输出0。
+*/
+int moreThenHalfNum(vector<int>& nums){
+    int res = 0, vote = 0;
+    for(int i = 0; i < nums.size(); i++){
+        if(vote == 0){
+            res = nums[i];
+        }
+        if(res == nums[i]){
+            vote++;
+        }else{
+            vote--;
+        }
+    }
+    int count = 0;
+    for(auto n : nums){
+        if(n == res) ++count;
+    }
+    return count > nums.size() / 2 ? res : 0;
+}
+
+/*
 k个一组翻转链表
 将给出的链表中的节点每 k 个一组翻转，返回翻转后的链表
 如果链表中的节点数不是 k 的倍数，将最后剩下的节点保持原样
@@ -142,7 +166,7 @@ public:
         if(!root || root -> val == o1 || root -> val == o2) 
             return root;
         TreeNode* leftnode = common(root->left, o1, o2);  //返回的是左子树中是否包含o1或o2
-        TreeNode* rightnode = common(root -> right, o1, o2);   // 返回的是左字树中是否包含o1或o2
+        TreeNode* rightnode = common(root -> right, o1, o2);   // 返回的是右字树中是否包含o1或o2
         if(leftnode == nullptr) return rightnode;
         if(rightnode == nullptr) return leftnode;
         return root;
@@ -297,6 +321,54 @@ int numIslands(vector<vector<char> >& grid) {
     }
     return res;
 }
+/*
+回溯+判断
+数字字符串转ip地址  
+现在有一个只包含数字的字符串，将该字符串转化成IP地址的形式，返回所有可能的情况。
+例如：
+给出的字符串为"25525522135",
+返回["255.255.22.135", "255.255.221.35"]. (顺序没有关系)
+*/
+class solution{
+    vector<string> res;
+    vector<string> restore(string s){
+        backtracking(s, 0, 0);
+        return res;
+    }
+    void backtracking(string s, int startindex, int point){
+        if(point == 3){
+            if(isValid(s, startindex, s.size() - 1)){
+                res.push_back(s);
+            }
+            return;
+        }
+        for(int i = startindex; i < s.size(); i++){
+            if(isValid(s, startindex, i)){
+                s.insert(s.begin() + i + 1, '.');
+                point++;
+                backtracking(s, i + 2, point);
+                point--;
+                s.erase(s.begin() + i + 1);
+            }else break;
+        }
+    }
+    bool isValid(string s, int start, int end){
+        if(start > end) return false;
+        if(s[start] == '0' && start != end){
+            return false;
+        }
+        int num = 0;
+        for(int i = start; i <= end; i++){
+            num = num * 10 + s[i] - '0';
+            if(s[i] > '9' || s[i] < '0' || num > 255){
+                return false;
+            }
+        }
+        return true;
+    }
+
+};
+
 
 /*
 双指针
@@ -390,6 +462,46 @@ int findTargetSumWays(vector<int>& nums, int S) {
     return dp[target];
 }
 
+/*
+二分法
+寻找两个正序数组的中位数
+给定两个大小分别为 m 和 n 的正序（从小到大）数组 nums1 和 nums2。请你找出并返回这两个正序数组的 中位数 。
+*/
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        //如果两个数组的中位数mid1 < mid2, 则说明合并后的中位数位于nums1 right+ num2之间
+        //否则合并后的中位数位于 nums2.right + nums1 之间 (right 是相对于 mid 而言的) 
+        //findKth 函数负责找到两个数组合并(假设)后有序的数组中的第 k 个元素, k 从 1 开始计算
+    
+        if(nums1.size() == 0 && nums2.size() == 0) return 0.0;
+        int m = nums1.size(), n = nums2.size();
+        int l = (m + n + 1) / 2;
+        int r = (m + n + 2) / 2;
+        if(l == r) return findKth(nums1, 0, nums2, 0, l);
+        else return (findKth(nums1, 0, nums2, 0, l) + findKth(nums1, 0, nums2, 0, r)) / 2.0;
+    }
+    int findKth(vector<int>& nums1, int i, vector<int>& nums2, int j, int k){
+        //边界情况，如果nums1数组穷尽了，则只能返回nums2中的第k个元素
+        if(i >= nums1.size()) return nums2[j + k - 1];
+        if(j >= nums2.size()) return nums1[i + k - 1];
+        //边界情况，如果k==1，则返回两个数组中最小的那个
+        if(k == 1){
+            return min(nums1[i], nums2[j]);
+        }
+        //在nums1和nums2的当前范围内找出mid1和mid2，判断舍弃哪半部分
+        int mid1 = INT_MAX;
+        int mid2 = INT_MAX;
+        if(i + k/2 - 1 < nums1.size()) mid1 = nums1[i + k/2 - 1];
+        if(j + k/2 - 1 < nums2.size()) mid2 = nums2[j + k/2 - 1];
+        //mid1 < mid2 在num1.right和nums2之间搜索，丢掉k/2个数
+        if(mid1 < mid2){
+            return findKth(nums1, i + k/2, nums2, j, k - k/2);
+        }else{
+            return findKth(nums1, i, nums2, j + k/2, k - k/2);
+        }
+    }
+};
 
 
 
