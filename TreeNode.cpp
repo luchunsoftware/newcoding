@@ -132,7 +132,41 @@ public:
         return compare(p -> left, q -> right) && compare(p -> right, q -> left);
     }
 };
+/*
+给定一棵二叉树，已经其中没有重复值的节点，请判断该二叉树是否为搜索二叉树和完全二叉树。
+*/
+/**
+ * struct TreeNode {
+ *	int val;
+ *	struct TreeNode *left;
+ *	struct TreeNode *right;
+ * };
+ */
 
+class Solution {
+public:
+    vector<bool> judgeIt(TreeNode* root) {
+         return {isSearchTree(root,INT_MIN,INT_MAX),isCompletedTree(root)};
+    }
+    bool isSearchTree(TreeNode *root, int left, int right)
+    {
+        if(root == nullptr) 
+            return true;
+        if(root->val < left || root->val > right)
+            return false;
+        return isSearchTree(root->left,left,root->val) && isSearchTree(root->right, root->val,right);
+    }
+    bool isCompletedTree(TreeNode* root)
+    {
+        if(root == nullptr) 
+            return true;
+        if(root->left && root->right == nullptr)
+            return isCompletedTree(root->left);
+        if(root->left == nullptr && root->right)
+            return false;
+        return isCompletedTree(root->left) && isCompletedTree(root->right);
+    }
+};
 
 /*
 二叉树的镜像
@@ -159,7 +193,7 @@ public:
         }
         return root;
     }
-}
+};
 
 /*
 二叉树的最大深度
@@ -237,6 +271,20 @@ public:
 根节点到叶子节点的路径 1→3 用数字 13 代替
 所以答案为\ 12+13=25
 */
+
+int dfs(TreeNode* root, int sum){
+    if(root == nullptr) return 0;
+    sum = 10 * sum + root -> val;
+    if(root -> left == nullptr && root -> right == nullptr){
+        return sum;
+    }
+    return dfs(root ->left, sum) + dfs(root -> right, sum);
+}
+
+int sumPath(TreeNode* root){
+    if(root == nullptr) return 0;
+    return dfs(root, 0);
+}
 
 
 
