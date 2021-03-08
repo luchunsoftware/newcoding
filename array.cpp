@@ -8,7 +8,7 @@ using namespace std;
 例如arr = [-1, 2, 3, 4]。返回1
 arr = [1, 2, 3, 4]。返回5
 [要求]
-时间复杂度为O(n)O(n)，空间复杂度为O(1)O(1)
+时间复杂度为O(n)，空间复杂度为O(1)
 */
 class Solution {
 public:

@@ -260,6 +260,27 @@ public:
 };
 
 /*
+（补充）二叉搜索树的最近公共祖先
+ 对二叉搜索树来说
+ 满足根节点比左子树大比右子树小的性质 通过比较val值就能知道是不是在该节点
+*/
+class Solution{
+public:
+    TreeNode* binarySearchTree(TreeNode* root, TreeNode* p, TreeNode* q){
+        if(p -> val > q -> val) swap(p, q);
+        while(root){
+            if(root -> val  < p -> val){
+                root = root -> right;
+            }else if(root -> val > q -> val){
+                root = root -> left;
+            }else break;
+        }
+        return root;
+    }
+};
+
+
+/*
 二叉树根节点到叶子节点的所有路径之和
 
 给定一个仅包含数字 0−9 的二叉树，每一条从根节点到叶子节点的路径都可以用一个数字表示。

@@ -2,10 +2,11 @@
 #include<vector>
 
 using namespace std;
+
+
 /*
 请实现有重复数字的升序数组的二分查找。
 输出在数组中第一个大于等于查找值的位置，如果数组中不存在这样的数，则输出数组长度加一。
-
 */
 class Solution {
 public:
@@ -163,7 +164,62 @@ public:
 并且每个数字都在范围0～n-1之内。在范围0～n-1内的n个数字中有且只有一个数字不在该数组中，请找出这个数字。
 
 */
+int missingNumber(vector<int>& nums){
+    int n = nums.size();
+    int left = 0, right = n - 1;
+    while(left <= right){
+        int mid = left + (right - left) / 2;
+        if(nums[mid] == mid){
+            left = mid + 1;
+        }else{
+            right = mid - 1;
+        }
+    }
+    return left;
+}
 
+
+
+/*
+二分法
+寻找两个正序数组的中位数
+给定两个大小分别为 m 和 n 的正序（从小到大）数组 nums1 和 nums2。请你找出并返回这两个正序数组的 中位数 。
+*/
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        //如果两个数组的中位数mid1 < mid2, 则说明合并后的中位数位于nums1 right+ num2之间
+        //否则合并后的中位数位于 nums2.right + nums1 之间 (right 是相对于 mid 而言的) 
+        //findKth 函数负责找到两个数组合并(假设)后有序的数组中的第 k 个元素, k 从 1 开始计算
+    
+        if(nums1.size() == 0 && nums2.size() == 0) return 0.0;
+        int m = nums1.size(), n = nums2.size();
+        int l = (m + n + 1) / 2;
+        int r = (m + n + 2) / 2;
+        if(l == r) return findKth(nums1, 0, nums2, 0, l);
+        else return (findKth(nums1, 0, nums2, 0, l) + findKth(nums1, 0, nums2, 0, r)) / 2.0;
+    }
+    int findKth(vector<int>& nums1, int i, vector<int>& nums2, int j, int k){
+        //边界情况，如果nums1数组穷尽了，则只能返回nums2中的第k个元素
+        if(i >= nums1.size()) return nums2[j + k - 1];
+        if(j >= nums2.size()) return nums1[i + k - 1];
+        //边界情况，如果k==1，则返回两个数组中最小的那个
+        if(k == 1){
+            return min(nums1[i], nums2[j]);
+        }
+        //在nums1和nums2的当前范围内找出mid1和mid2，判断舍弃哪半部分
+        int mid1 = INT_MAX;
+        int mid2 = INT_MAX;
+        if(i + k/2 - 1 < nums1.size()) mid1 = nums1[i + k/2 - 1];
+        if(j + k/2 - 1 < nums2.size()) mid2 = nums2[j + k/2 - 1];
+        //mid1 < mid2 在num1.right和nums2之间搜索，丢掉k/2个数
+        if(mid1 < mid2){
+            return findKth(nums1, i + k/2, nums2, j, k - k/2);
+        }else{
+            return findKth(nums1, i, nums2, j + k/2, k - k/2);
+        }
+    }
+};
 
 
 
