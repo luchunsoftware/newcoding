@@ -120,18 +120,16 @@ public:
 对称二叉树   从顶至底递归，判断每对节点是否对称，从而判断树是否为对称二叉树
 判断一棵二叉树是不是对称的。如果一棵二叉树和它的镜像一样，那么它是对称的。
 */
-class Solution{
-public:
-    bool isSymmetric(TreeNode* root){
-        if(root == nullptr) return true;
-        return compare(root -> left, root -> right);
-    }
-    bool compare(TreeNode* p, TreeNode* q){
-        if(p == nullptr && q == nullptr) return true;
-        if(p == nullptr || q == nullptr || p -> val != q -> val) return false;
-        return compare(p -> left, q -> right) && compare(p -> right, q -> left);
-    }
-};
+
+bool isSymmetric(TreeNode* root){
+    if(root == nullptr) return true;
+    return compare(root -> left, root -> right);
+}
+bool compare(TreeNode* p, TreeNode* q){
+    if(p == nullptr && q == nullptr) return true;
+    if(p == nullptr || q == nullptr || p -> val != q -> val) return false;
+    return compare(p -> left, q -> right) && compare(p -> right, q -> left);
+}
 /*
 给定一棵二叉树，已经其中没有重复值的节点，请判断该二叉树是否为搜索二叉树和完全二叉树。
 */
