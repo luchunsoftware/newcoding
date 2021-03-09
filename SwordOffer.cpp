@@ -2,6 +2,7 @@
 #include<unordered_map>
 #include<string>
 #include<stack>
+#include<queue>
 
 using namespace std;
 /*
@@ -199,7 +200,7 @@ bool dfs(vector<vector<char> >& board, string word, int i, int j, int k) {
     //终止条件
     if(k == word.size() - 1) 
         return true;
-    board[i][j] = '\0';
+    board[i][j] = '\0';  //标记已访问过的元素
     bool res = dfs(board, word, i + 1, j, k + 1) || dfs(board, word, i - 1, j, k + 1) || 
                     dfs(board, word, i, j + 1, k + 1) || dfs(board, word, i , j - 1, k + 1);
     board[i][j] = word[k];
@@ -215,6 +216,531 @@ bool exist(vector<vector<char> >& board, string word) {
         }
     }
     return false;
+}
+
+/*
+13、机器人运动范围 dfs+回溯
+地上有一个m行n列的方格，从坐标 [0,0] 到坐标 [m-1,n-1] 。
+一个机器人从坐标 [0, 0] 的格子开始移动，它每次可以向左、右、上、下移动一格（不能移动到方格外），
+也不能进入行坐标和列坐标的数位之和大于k的格子。
+例如，当k为18时，机器人能够进入方格 [35, 37] ，
+因为3+5+3+7=18。但它不能进入方格 [35, 38]，因为3+5+3+8=19。
+请问该机器人能够到达多少个格子？
+*/
+
+//在(i, j)坐标上，数位和是si和sj
+int dfs(int i, int j, int si, int sj,  int m, int n, int k, vector<vector<bool> > &visited) {
+    //剪枝操作，在搜索中，遇到数位和超出目标值、此元素已访问，则应立即返回
+    if(i >= m || j >= n || k < si + sj || visited[i][j]) return 0;
+    visited[i][j] = true;
+    //(i + 1) % 10 != 0 ? si + 1 : si - 8 之前数位和是si，i+1以后，可能会从9 -> 10,这样si相当于减了8
+    return 1 + dfs(i + 1, j, (i + 1) % 10 != 0 ? si + 1 : si - 8, sj, m, n, k, visited) +
+                dfs(i, j + 1, si, (j + 1) % 10 != 0 ? sj + 1 : sj - 8, m, n, k, visited);
+}
+int movingCount(int m, int n, int k) {
+    vector<vector<bool> > visited(m, vector<bool>(n, false));
+    return dfs(0, 0, 0, 0, m, n, k, visited);
+}
+
+/*
+14、剪绳子
+给你一根长度为 n 的绳子，请把绳子剪成整数长度的 m 段（m、n都是整数，n>1并且m>1），
+每段绳子的长度记为 k[0],k[1]...k[m-1] 。请问 k[0]*k[1]*...*k[m-1] 可能的最大乘积是多少？
+例如，当绳子的长度是8时，我们把它剪成长度分别为2、3、3的三段，此时得到的最大乘积是18。
+*/
+int cuttingRope(int n){
+    if(n <= 3) return n - 1;
+    long res = 1;
+    while(n > 4){
+        res *= 3;
+        n -= 3;
+    }
+    return res * n;
+}
+
+/*
+15、二进制中1的个数
+请实现一个函数，输入一个整数（以二进制串形式），输出该数二进制表示中 1 的个数。
+例如，把 9 表示成二进制是 1001，有 2 位是 1。因此，如果输入 9，则该函数输出 2。
+*/
+int hammingWeight(uint32_t n) {
+    int sum = 0;
+    while(n){
+        sum++;
+        n &= (n - 1);
+    }
+    return sum;
+}
+
+/*
+16、数值的整数次方 （二分）
+实现 pow(x, n) ，即计算 x 的 n 次幂函数（即，xn）。不得使用库函数，同时不需要考虑大数问题。
+*/
+
+double myPow(double x, int n) {
+    if(x == 0) return 0;
+    long m = n;
+    double res = 1;
+    if(m < 0){
+        x = 1 / x;
+        m = -m;
+    }
+    while(m > 0){
+        if(m % 2 == 1) res *= x;
+        m /= 2;
+        x *= x;
+    }
+    return res;
+}
+
+/*
+17、打印从1到最大的n位数
+输入数字 n，按顺序打印出从 1 到最大的 n 位十进制数。比如输入 3，则打印出 1、2、3 一直到最大的 3 位数 999。
+*/
+vector<int> printNumbers(int n) {
+    int endVal = pow(10, n) - 1;
+    vector<int> res(endVal);
+    for (int i = 0; i < endVal; ++i)
+    {
+        res[i] = i + 1;
+    }
+    return res;
+}
+
+/*
+18、删除链表的节点
+给定单向链表的头指针和一个要删除的节点的值，定义一个函数删除该节点。
+返回删除后的链表的头节点。
+*/
+ListNode* deleteNode(ListNode* head, int val) {
+    ListNode* dummy = new ListNode(0);
+    dummy -> next = head;
+    ListNode* cur = dummy;
+    while(cur -> next){
+        if(cur -> next -> val == val){
+            cur -> next = cur -> next -> next;
+            break;
+        }else{
+            cur = cur -> next;
+        }
+    }
+    return dummy -> next;
+}
+
+/*
+19、正则表达式匹配
+请实现一个函数用来匹配包含'. '和'*'的正则表达式。
+模式中的字符'.'表示任意一个字符，而'*'表示它前面的字符可以出现任意次（含0次）。
+在本题中，匹配是指字符串的所有字符匹配整个模式。
+例如，字符串"aaa"与模式"a.a"和"ab*ac*a"匹配，但与"aa.a"和"ab*a"均不匹配。
+*/
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        int m = s.size();
+        int n = p.size();
+
+        auto matches = [&](int i, int j) {
+            if (i == 0) {
+                return false;
+            }
+            if (p[j - 1] == '.') {
+                return true;
+            }
+            return s[i - 1] == p[j - 1];
+        };
+
+        vector<vector<int> > f(m + 1, vector<int>(n + 1));
+        f[0][0] = true;
+        for (int i = 0; i <= m; ++i) {
+            for (int j = 1; j <= n; ++j) {
+                if (p[j - 1] == '*') {
+                    f[i][j] |= f[i][j - 2];
+                    if (matches(i, j - 1)) {
+                        f[i][j] |= f[i - 1][j];
+                    }
+                }
+                else {
+                    if (matches(i, j)) {
+                        f[i][j] |= f[i - 1][j - 1];
+                    }
+                }
+            }
+        }
+        return f[m][n];
+    }
+};
+
+/*
+20、表示数值的字符串
+请实现一个函数用来判断字符串是否表示数值（包括整数和小数）。
+例如，字符串"+100"、"5e2"、"-123"、"3.1416"、"-1E-16"、"0123"都表示数值，
+但"12e"、"1a3.14"、"1.2.3"、"+-5"及"12e+5.4"都不是。
+
+*/
+class Solution {
+public:
+    bool isNumber(string s) {
+        //1）先去除字符串首尾的空格
+        //2）然后根据e划分指数和底数
+        //3）判断指数和底数是否合法即可
+
+        //1、从首尾寻找s中不为空格首尾位置，也就是去除首尾空格
+        int i=s.find_first_not_of(' ');
+        if(i==string::npos)return false;
+        int j=s.find_last_not_of(' ');
+        s=s.substr(i,j-i+1);
+        if(s.empty())return false;
+
+        //2、根据e来划分底数和指数
+        int e=s.find('e');
+
+        //3、指数为空，判断底数
+        if(e==string::npos)return judgeP(s);
+
+        //4、指数不为空，判断底数和指数
+        else return judgeP(s.substr(0,e))&&judgeS(s.substr(e+1));
+    }
+
+    bool judgeP(string s)//判断底数是否合法
+    {
+        bool result=false,point=false;
+        int n=s.size();
+        for(int i=0;i<n;++i)
+        {
+            if(s[i]=='+'||s[i]=='-'){//符号位不在第一位，返回false
+                if(i!=0)return false;
+            }
+            else if(s[i]=='.'){
+                if(point)return false;//有多个小数点，返回false
+                point=true;
+            }
+            else if(s[i]<'0'||s[i]>'9'){//非纯数字，返回false
+                return false;
+            }
+            else{
+                result=true;
+            }
+        }
+        return result;
+    }
+
+    bool judgeS(string s)//判断指数是否合法
+    {   
+        bool result=false;
+        //注意指数不能出现小数点，所以出现除符号位的非纯数字表示指数不合法
+        for(int i=0;i<s.size();++i)
+        {
+            if(s[i]=='+'||s[i]=='-'){//符号位不在第一位，返回false
+                if(i!=0)return false;
+            }
+            else if(s[i]<'0'||s[i]>'9'){//非纯数字，返回false
+                return false;
+            }
+            else{
+                result=true;
+            }
+        }
+        return result;
+    }
+};
+
+/*
+21、调整数组顺序使奇数在偶数前面
+输入一个整数数组，实现一个函数来调整该数组中数字的顺序，
+使得所有奇数位于数组的前半部分，所有偶数位于数组的后半部分。
+*/
+vector<int> exchange(vector<int>& nums) {
+    int left = 0, right = nums.size() - 1;
+    while(left < right){
+        if(nums[left] % 2  == 1){
+            left++;
+        }else if(nums[right] %2 == 0){
+            right--;
+        }else{
+            swap(nums[left++], nums[right--]);
+        } 
+    }
+    return nums;
+}
+
+/*
+22、链表的倒数第k个节点
+输入一个链表，输出该链表中倒数第k个节点。
+为了符合大多数人的习惯，本题从1开始计数，即链表的尾节点是倒数第1个节点。
+*/
+ListNode* getKthFromEnd(ListNode* head, int k) {
+    ListNode* fast = head;
+    ListNode* slow = head;
+    while(k--){
+        fast = fast -> next;
+    }
+    while(fast){
+        fast = fast -> next;
+        slow = slow -> next;
+    }
+    return slow;
+}
+
+/*
+24、反转链表
+定义一个函数，输入一个链表的头节点，反转该链表并输出反转后链表的头节点。
+*/
+ListNode* reverse(ListNode* head){
+    ListNode* pre = nullptr;
+    ListNode* cur = head;
+    while(cur){
+        ListNode* node = cur -> next;
+        cur -> next = pre;
+        pre = cur;
+        cur = node;
+    } 
+    return pre;
+}
+
+/*
+25、合并两个排序好的链表
+输入两个递增排序的链表，合并这两个链表并使新链表中的节点仍然是递增排序的。
+*/
+ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+    if(l1 == NULL) return l2;
+    if(l2 == NULL) return l1;
+    if(l1 -> val < l2 -> val){
+        l1 -> next = mergeTwoLists(l1 -> next, l2);
+        return l1;
+    }else{
+        l2 -> next = mergeTwoLists(l1, l2 -> next);
+        return l2;
+    }
+}
+
+/*
+26、树的子结构
+输入两棵二叉树A和B，判断B是不是A的子结构。(约定空树不是任意一个树的子结构)
+B是A的子结构， 即 A中有出现和B相同的结构和节点值。
+*/
+bool isSubStructure(TreeNode* A, TreeNode* B) {
+    return (A && B) && (recur(A, B) ||isSubStructure(A -> left, B) || isSubStructure(A -> right, B));
+}
+bool recur(TreeNode* A, TreeNode* B){
+    if(B == NULL) return true;
+    if(A == NULL || A -> val != B -> val) return false;
+    return recur(A -> left, B -> left) && recur(A -> right, B -> right);
+}
+
+/*
+27、二叉树的镜像
+请完成一个函数，输入一个二叉树，该函数输出它的镜像。
+*/
+class Solution{
+public:
+    TreeNode* mirror(TreeNode* root){
+        if(root == nullptr) return root;
+        swap(root -> left, root -> right);
+        mirror(root -> left);
+        mirror(root -> right);
+        return root;
+    }
+    TreeNode* mirrorTree(TreeNode* root) {
+        stack<TreeNode*> st;
+        if(root==NULL) return root;
+        st.push(root);
+        while(!st.empty()){
+            TreeNode* node = st.top();
+            st.pop();
+            if(node -> left) st.push(node -> left);
+            if(node -> right) st.push(node -> right);
+            swap(node -> left, node -> right);
+        }
+        return root;
+    }
+};
+
+/*
+28、对称二叉树
+请实现一个函数，用来判断一棵二叉树是不是对称的。如果一棵二叉树和它的镜像一样，那么它是对称的。
+*/
+bool isSymmetric(TreeNode* root) {
+    if(root == NULL) return true;
+    return compare(root -> left, root -> right);
+}
+bool compare(TreeNode* p, TreeNode* q){
+    if(p == NULL && q == NULL) return true;
+    if(p == NULL || q == NULL || q -> val != p -> val) return false;
+    return compare(p -> left, q -> right) && compare(p ->right, q -> left);
+}
+
+/*
+29、顺时针打印矩阵
+输入一个矩阵，按照从外向里以顺时针的顺序依次打印出每一个数字。
+*/
+class Solution {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        vector<int> res;
+        if(matrix.size() == 0) return res;
+        int top = 0, bottom = matrix.size() - 1;
+        int left = 0, right = matrix[0].size() - 1;
+        while(true){
+            for(int i = left; i <= right; i++){
+                res.push_back(matrix[top][i]);        
+            }
+            if(++top > bottom) break;     //最上面一行遍历完删除
+            for(int i = top; i <= bottom; i++){
+                res.push_back(matrix[i][right]);
+            }
+            if(--right < left) break;     //最右边一列遍历完删除
+            for(int i = right; i >= left; i--){
+                res.push_back(matrix[bottom][i]);
+            }
+            if(--bottom < top) break;     //
+            for(int i = bottom; i >= top; i--){
+                res.push_back(matrix[i][left]);
+            }
+            if(++left > right) break;
+        }
+        return res;
+    }
+};
+
+/*
+30、包含min函数的栈
+定义栈的数据结构，
+请在该类型中实现一个能够得到栈的最小元素的 min 函数在该栈中，
+调用 min、push 及 pop 的时间复杂度都是 O(1)。
+*/
+class MinStack {
+private:
+  stack<int> stk;
+  stack<int> monoStk;     ////< @note 单调栈，从栈顶到栈底递增
+public:
+  MinStack() {
+  }
+
+  void push(int x) {
+    stk.push(x);
+    if (monoStk.empty() || monoStk.top() >= x) {
+      monoStk.push(x);     ////< @note 必须是大于等于，否则弹出时缺少最小值
+    }
+  }
+
+  void pop() {
+    if (stk.top() == monoStk.top()) {
+      monoStk.pop();
+    }
+    stk.pop();
+  }
+
+  int top() {
+    return stk.top();
+  }
+
+  int min() {
+    return monoStk.top();
+  }
+};
+
+/*
+31、栈的压入、弹出序列
+输入两个整数序列，第一个序列表示栈的压入顺序，
+请判断第二个序列是否为该栈的弹出顺序。
+假设压入栈的所有数字均不相等。
+例如，序列 {1,2,3,4,5} 是某栈的压栈序列，
+序列 {4,5,3,2,1} 是该压栈序列对应的一个弹出序列，
+但 {4,3,5,1,2} 就不可能是该压栈序列的弹出序列。
+*/
+
+//因为元素唯一，所以压入和弹出的顺序是固定的，每次将pushed当中的元素入栈，
+//并将栈顶元素与popped中的元素一直比较，若相等则出栈，否则结束while循环，重新从pushed当中取元素入栈。
+bool validateStackSequences(vector<int>& pushed, vector<int>& popped) {
+    stack<int> st;
+    int index = 0;
+    for (auto x : pushed) {
+        st.push(x);
+        while (!st.empty() && st.top() == popped[index]) {
+            st.pop();
+            ++index;
+        }
+    }
+    return st.empty();
+}
+
+/*
+32-1、从上到下打印二叉树
+从上到下打印出二叉树的每个节点，同一层的节点按照从左到右的顺序打印。
+*/
+vector<int> levelOrder1(TreeNode* root) {
+    vector<int> res;
+    if(root == NULL) return res;
+    queue<TreeNode*> q;
+    q.push(root);
+    while(!q.empty()){
+        int cursize = q.size();
+        for(int i = 0; i < cursize; i++){
+            TreeNode* node = q.front();
+            q.pop();
+            res.push_back(node -> val);
+            if(node -> left) q.push(node -> left);
+            if(node -> right) q.push(node -> right);
+        }
+    }
+    return res;
+}
+
+/*
+32-2、从上到下打印二叉树
+从上到下按层打印二叉树，同一层的节点按从左到右的顺序打印，每一层打印到一行。
+*/
+vector<vector<int> > levelOrder2(TreeNode* root) {
+    vector<vector<int> > res;
+    if(root == NULL) return res;
+    queue<TreeNode*> q;
+    q.push(root);
+    while(!q.empty()){
+        int cursize = q.size();
+        vector<int> vec;
+        for(int i = 0; i < cursize; i++){
+            TreeNode* node = q.front();
+            vec.push_back(node -> val);
+            q.pop();
+            if(node -> left) q.push(node -> left);
+            if(node -> right) q.push(node -> right);
+        }
+        res.push_back(vec);
+    }
+    return res;
+}
+
+/*
+32-3 之字型打印二叉树
+请实现一个函数按照之字形顺序打印二叉树，
+即第一行按照从左到右的顺序打印，
+第二层按照从右到左的顺序打印，
+第三行再按照从左到右的顺序打印，其他行以此类推。
+*/
+vector<vector<int> > levelOrder3(TreeNode* root) {
+    vector<vector<int> > res;
+    if(root == NULL) return res;
+    queue<TreeNode*> q;
+    q.push(root);
+    int flag = 1;
+    while(!q.empty()){
+        int size = q.size();
+        vector<int> vec;
+        for(int i = 0; i < size; i++){
+            TreeNode* node = q.front();
+            q.pop();
+            vec.push_back(node -> val);
+            if(node -> left) q.push(node -> left);
+            if(node -> right) q.push(node -> right);
+        }
+        if(flag % 2 == 0){
+            reverse(vec.begin(), vec.end());
+        }
+        flag++;
+        res.push_back(vec);
+    }
+    return res;
 }
 
 

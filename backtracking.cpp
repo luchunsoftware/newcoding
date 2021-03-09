@@ -1,8 +1,8 @@
 /*
 剑指offer 38.字符串的全排列 有重复 中等 去重
-46.全排列 无重复数字 中等
-47. 全排列 又重复数字 中等 去重
-40.加起来和为目标值的组合 中等 去重操作
+46. 全排列 无重复数字 中等
+47. 全排列 有重复数字 中等 去重
+40.加起来和为目标值的组合 中等 去重
 */
 
 
@@ -56,7 +56,7 @@ public:
 */
 class Solution{
 public:
-    vector<vector<int>> res;
+    vector<vector<int> > res;
     vector<int> path;
     void backtracking(vector<int>& arr, vector<bool>& used){
         if(path.size() == arr.size()){
@@ -74,7 +74,7 @@ public:
         }
     }
 
-    vector<vector<int>> permute(vector<int>& arr){
+    vector<vector<int> > permute(vector<int>& arr){
         vector<bool> used(arr.size(), false);
         backtracking(arr,used);
         return res;
@@ -82,12 +82,12 @@ public:
 };
 
 /*
-47. 全排列 又重复数字 中等 去重
+47. 全排列 有重复数字 中等 去重
 */
 
 class Solution{
 public:
-    vector<vector<int>> res;
+    vector<vector<int> > res;
     vector<int> path;
     void backtracking(vector<int>& arr, vector<bool>& used){
         if(path.size() == arr.size()){
@@ -99,14 +99,14 @@ public:
             if(used[i] == false){
                 path.push_back(arr[i]);
                 used[i] = true;
-                backtracking(arr,used);
+                backtracking(arr, used);
                 used[i] = false;
                 path.pop_back();
             }
         }
     }
 
-    vector<vector<int>> permute(vector<int>& arr){
+    vector<vector<int> > permute(vector<int>& arr){
         vector<bool> used(arr.size(), false);
         sort(arr.begin(), arr.end());
         backtracking(arr,used);
@@ -119,12 +119,12 @@ public:
 */
 class Solution {
 public:
-    vector<vector<int>> result;
+    vector<vector<int> > res;
     vector<int> path;
     void backtracking(vector<int>& nums, int target, int startIndex, int sum, vector<bool>& used){
         if(sum > target) return;
         if(sum == target){
-            result.push_back(path);
+            res.push_back(path);
             return;
         }
         for(int i = startIndex; i < nums.size(); i++){
@@ -142,6 +142,6 @@ public:
         sort(num.begin(), num.end());
         vector<bool> used(num.size(), false);
         backtracking(num, target, 0, 0, used);
-        return result;
+        return res;
     }
 };

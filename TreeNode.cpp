@@ -307,6 +307,34 @@ int sumPath(TreeNode* root){
     return dfs(root, 0);
 }
 
+/*
+二叉树指定和路径  二叉树方案搜索问题，使用回溯法解决  先序遍历 + 路径记录
+给定一个二叉树和一个值 sum，请找出所有的根节点到叶子节点的节点值之和等于 sum 的路径，
+例如：
+sum=22，
+返回：
+[
+[5,4,11,2],
+[5,8,9]
+]
+*/
+vector<vector<int> > res;
+vector<int> path;
+void backtracking(TreeNode* root, int sum){
+    if(root == nullptr) return;
+    path.push_back(root -> val);
+    sum -= root -> val;
+    if(sum == 0 && root -> left == nullptr && root -> right == nullptr){
+        res.push_back(path);
+    }
+    backtracking(root -> left, sum);
+    backtracking(root -> right, sum);
+    path.pop_back();
+}
 
+vector<vector<int> > pathSum(TreeNode* root, int sum){
+    backtracking(root, sum);
+    return res;
+}
 
 
