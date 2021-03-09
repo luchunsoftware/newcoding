@@ -225,21 +225,15 @@ public:
 /*
 对称二叉树
 */
-class Solution{
-public:
-    bool compare(TreeNode* left, TreeNode* right){
-        if(left == nullptr && left != nullptr) return false;
-        else if(left != nullptr && right == nullptr) return false;
-        else if(left -> val != right -> val) return false;
-        else if(left == nullptr && right == nullptr) return true;
-        else return compare(left -> left, right -> right) && compare(left -> right, right -> left);
-    }
-
-    bool isSymmetric(TreeNode* root){
-        if(root == nullptr) return true;
-        return compare(root -> left, root -> right);
-    }
-};
+bool isSymmetric(TreeNode* root) {
+    if(root == NULL) return true;
+    return compare(root -> left, root -> right);
+}
+bool compare(TreeNode* p, TreeNode* q){
+    if(p == NULL && q == NULL) return true;
+    if(p == NULL || q == NULL || q -> val != p -> val) return false;
+    return compare(p -> left, q -> right) && compare(p ->right, q -> left);
+}
 
 /*
 二叉树的最近公共祖先
