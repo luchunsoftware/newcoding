@@ -1,5 +1,6 @@
 #include<vector>
 #include<unordered_map>
+#include<unordered_set>
 #include<string>
 #include<stack>
 #include<queue>
@@ -742,6 +743,341 @@ vector<vector<int> > levelOrder3(TreeNode* root) {
     }
     return res;
 }
+
+/*
+33、二叉搜素树的后序遍历序列
+输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历结果。
+如果是则返回 true，否则返回 false。假设输入的数组的任意两个数字都互不相同。
+输入: [1,3,2,6,5]
+输出: true
+输入: [1,6,3,2,5]
+输出: false
+*/
+bool dfs(vector<int>& postorder, int start, int end){
+    if (start >= end)  return true;    // 单个结点，必然是二叉树
+    int p = start;
+    int rootVal = postorder[end];
+    while (postorder[p] < rootVal){    // 找左子树的结束位置
+        ++p;
+    }
+    int leftEnd = p - 1;               // 设置左子树结束位置
+    while (postorder[p] > rootVal){    // 找右子树的结束位置
+        ++p;
+    }
+    // 右子树结束位置应该正好在end这里
+    return p == end && dfs(postorder, start, leftEnd) && dfs(postorder, leftEnd+1, end-1);
+}
+bool verifyPostorder(vector<int>& postorder) {
+    return dfs(postorder, 0, postorder.size()-1);
+}
+
+/*
+35、复杂链表的复制
+请实现 copyRandomList 函数，复制一个复杂链表。
+在复杂链表中，每个节点除了有一个 next 指针指向下一个节点，
+还有一个 random 指针指向链表中的任意节点或者 null。
+*/
+struct Node{
+    int val;
+    Node* next;
+    Node* random;
+    Node(int _val) {
+        val = _val;
+        next = NULL;
+        random = NULL;
+    }
+};
+Node* copyRandomList(Node* head) {
+    if(head == NULL)  return head;
+    unordered_map<Node*, Node*> map;
+    Node* t = head;
+    while(t != NULL){
+        map[t] = new Node(t -> val);
+        t = t -> next;
+    }
+    t = head;
+    while(t != NULL){
+        if(t -> next){
+            map[t] -> next = map[t -> next];
+        }
+        if(t -> random){
+            map[t] -> random = map[t -> random];
+        }
+        t = t->next;
+    }
+    return map[head];
+}
+
+/*
+36、二叉搜索树和双向链表
+输入一棵二叉搜索树，将该二叉搜索树转换成一个排序的循环双向链表。
+要求不能创建任何新的节点，只能调整树中节点指针的指向。
+希望可以就地完成转换操作。
+当转化完成以后，树中节点的左指针需要指向前驱，
+树中节点的右指针需要指向后继。
+还需要返回链表中的第一个节点的指针
+*/
+class Node {
+public:
+    int val;
+    Node* left;
+    Node* right;
+
+    Node() {}
+
+    Node(int _val) {
+        val = _val;
+        left = NULL;
+        right = NULL;
+    }
+
+    Node(int _val, Node* _left, Node* _right) {
+        val = _val;
+        left = _left;
+        right = _right;
+    }
+};
+Node *pre, *head;
+void dfs(Node* cur) {
+    if(cur == nullptr) return;
+    dfs(cur->left);
+    if(pre != nullptr) pre->right = cur;
+    else head = cur;
+    cur->left = pre;
+    pre = cur;
+    dfs(cur->right);
+}
+Node* treeToDoublyList(Node* root) {
+    if(root == nullptr) return nullptr;
+    dfs(root);
+    head->left = pre;
+    pre->right = head;
+    return head;
+}
+
+/*
+37、序列化二叉树
+实现两个函数，分别用来序列化和反序列化二叉树。
+*/
+class Codec {
+public:
+    string serialize(TreeNode* root) {
+        if (!root) return "X";
+        string l = "(" + serialize(root->left) + ")";
+        string r = "(" + serialize(root->right) + ")";
+        return  l + to_string(root->val) + r;
+    }
+
+    inline TreeNode* parseSubtree(const string &data, int &ptr) {
+        ++ptr; // 跳过左括号
+        TreeNode* subtree = parse(data, ptr);
+        ++ptr; // 跳过右括号
+        return subtree;
+    }
+
+    inline int parseInt(const string &data, int &ptr) {
+        int x = 0, sgn = 1;
+        if (!isdigit(data[ptr])) {
+            sgn = -1;
+            ++ptr;
+        }
+        while (isdigit(data[ptr])) {
+            x = x * 10 + data[ptr++] - '0';
+        }
+        return x * sgn;
+    }
+
+    TreeNode* parse(const string &data, int &ptr) {
+        if (data[ptr] == 'X') {
+            ++ptr;
+            return nullptr;
+        }
+        TreeNode* cur = new TreeNode(0);
+        cur->left = parseSubtree(data, ptr);
+        cur->val = parseInt(data, ptr);
+        cur->right = parseSubtree(data, ptr);
+        return cur;
+    }
+
+    TreeNode* deserialize(string data) {
+        int ptr = 0;
+        return parse(data, ptr);
+    }
+};
+
+/*
+38、字符串的排列
+输入一个字符串，打印出该字符串中字符的所有排列。
+你可以以任意顺序返回这个字符串数组，但里面不能有重复元素。
+*/
+void backtracking(string s, int startIndex, vector<string>& res){
+    if(startIndex == s.size()){
+        res.push_back(s);
+        return;
+    }
+    unordered_set<char> set;
+    for(int i = startIndex; i < s.size(); i++){
+        if(set.find(s[i]) != set.end()){
+            continue;
+        }else{
+            set.insert(s[i]);
+        }
+        swap(s[i], s[startIndex]);
+        backtracking(s, startIndex + 1, res);
+        swap(s[i], s[startIndex]);
+    }
+}
+vector<string> permutation(string s) {
+    vector<string> res;
+    backtracking(s, 0, res);
+    return res;
+}
+
+/*
+39、数组中次数超过一半的数字
+数组中有一个数字出现的次数超过数组长度的一半，请找出这个数字。
+你可以假设数组是非空的，并且给定的数组总是存在多数元素。
+*/
+int moreThanHalf(vector<int>& arr){
+    int res = 0, vote = 0;
+    for(int i = 0; i < arr.size(); i++){
+        if(vote == 0) res = arr[i];
+        if(res == arr[i]){
+            vote++;
+        }else{
+            vote--;
+        }   
+    }
+    return res;
+}
+
+/*
+40、最小的k个数
+输入整数数组 arr ，找出其中最小的 k 个数。
+例如，输入4、5、1、6、2、7、3、8这8个数字，则最小的4个数字是1、2、3、4。
+*/
+vector<int> getLeastNumbers(vector<int>& arr, int k) {
+    vector<int> res;
+    if(arr.size() == 0 || k > arr.size() || k <= 0) return res;
+    if(k == arr.size()) return arr;
+    int left = 0, right = arr.size() - 1;
+    while(left < right){
+        int mid = partition(arr, left, right);
+        if(mid == k) break;
+        else if(mid > k){
+            right = mid - 1;
+        }else{
+            left = mid + 1;
+        }
+    }
+    for(int i = 0; i < k; i++){
+        res.push_back(arr[i]);
+    }
+    return res;
+}
+int partition(vector<int>& arr,int low, int high){
+    int pivot = arr[low];
+    while(low < high){
+        while(low < high && arr[high] >= pivot) high--;
+        arr[low] = arr[high];
+        while(low < high && arr[low] <= pivot) low++;
+        arr[high] = arr[low];
+    }
+    arr[low] = pivot;
+    return low;
+}
+
+/*
+41、数据流中的中位数
+如何得到一个数据流中的中位数？
+如果从数据流中读出奇数个数值，
+那么中位数就是所有数值排序之后位于中间的数值。
+如果从数据流中读出偶数个数值，那么中位数就是所有数值排序之后中间两个数的平均值。
+*/
+/*
+每插入一个数之前，先判断两个堆的 size() 是否相等。
+若相等，先将这个数插入大顶堆，然后将大顶堆的 top() 插入小顶堆。
+这么做可以保证小顶堆的所有数永远大于等于大顶堆的 top()。
+若不相等，先将这个数插入小顶堆，然后将小顶堆的 top() 插入大顶堆。
+这么做可以保证大顶堆的所有数永远小于等于小顶堆的 top()。
+整个过程动态地做到了平衡两个堆的 size()，即保证它们的 size() 最大只相差了 1
+*/
+class MedianFinder {
+public:
+
+    priority_queue<int, vector<int>, less<int> > maxheap;
+    priority_queue<int, vector<int>, greater<int> > minheap;
+
+    MedianFinder() {
+
+    }
+    void addNum(int num) {
+        if(maxheap.size() == minheap.size()) {
+            maxheap.push(num);
+            minheap.push(maxheap.top());
+            maxheap.pop();
+        }
+        else {
+            minheap.push(num);
+            maxheap.push(minheap.top());
+            minheap.pop();
+        }
+    }
+    
+    double findMedian() {
+        int maxSize = maxheap.size(), minSize = minheap.size();
+        int mid1 = maxheap.top(), mid2 = minheap.top();
+        return maxSize == minSize ? ((mid1 + mid2) * 0.5) : mid2;
+    }
+};
+
+/*
+42、连续子数组的最大和
+输入一个整型数组，数组中的一个或连续多个整数组成一个子数组。求所有子数组的和的最大值。
+要求时间复杂度为O(n)。
+*/
+int maxSubArray(vector<int>& nums) {
+    vector<int> dp(nums.size());
+    dp[0] = nums[0];
+    int res = dp[0];
+    for(int i = 1; i < nums.size(); i++){
+        dp[i] = max(dp[i - 1] + nums[i], nums[i]);
+        res = max(res, dp[i]);
+    }
+    return res;
+}
+
+/*
+43、1～n整数中 1 的个数
+输入一个整数 n ，求1～n这n个整数的十进制表示中1出现的次数。
+
+例如，输入12，1～12这些整数中包含1 的数字有1、10、11和12，1一共出现了5次。
+*/
+int countDigitOne(int n) {
+    long digit = 1; // digit 需为 long 型，因为比如 n 是 INT_MAX，digit 会在最后一次循环越界
+    int high = n / 10, cur = n % 10, low = 0;
+    int res = 0;
+    while (high != 0 || cur != 0) {
+        if (cur == 0) {
+            res += high * digit;
+        }
+        else if (cur == 1) {
+            res += high * digit + low + 1;
+        }
+        else {
+            res += (high + 1) * digit;
+        }
+        low += cur * digit;
+        cur = high % 10;
+        high /= 10;
+        digit *= 10; 
+    }
+    return res;
+}
+
+/*
+
+*/
 
 
 
