@@ -1,7 +1,10 @@
 /*
-剑指offer 38.字符串的全排列 有重复 中等 去重
+剑指offer 
+93. 数字字符串转IP地址
+38. 字符串的全排列 有重复 中等 去重
 46. 全排列 无重复数字 中等
 47. 全排列 有重复数字 中等 去重
+39、组合总和   无重复数字，可重复选取
 40.加起来和为目标值的组合 中等 去重
 */
 
@@ -11,6 +14,52 @@
 #include<unordered_set>
 
 using namespace std;
+/*
+93.数字字符串转ip地址
+
+现在有一个只包含数字的字符串，将该字符串转化成IP地址的形式，返回所有可能的情况。
+例如：
+给出的字符串为"25525522135",
+返回["255.255.22.135", "255.255.221.35"]. (顺序没有关系)
+*/
+vector<string> res;
+void backtracking(string s, int startindex, int point){
+    if(point == 3){
+        if(isValid(s, startindex, s.size() - 1)){
+            res.push_back(s);
+        }
+        return;
+    }
+    for(int i = startindex; i < s.size(); i++){
+        if(isValid(s, startindex, i)){
+            s.insert(s.begin() + i + 1, '.');
+            point++;
+            backtracking(s, i + 2, point);
+            point--;
+            s.erase(s.begin() + i + 1);
+        }else{
+            break;
+        }
+    }
+}
+bool isValid(string s, int start, int end){
+    if(start > end) return false;
+    if(s[start] == '0' && start != end) return false;
+    int num = 0;
+    for(int i = start; i <= end; i++){
+        num = num * 10 + s[i] - '0';
+        if(s[i] > '9' || s[i] < '0' || num > 255){
+            return false;
+        }
+    }
+    return true;
+}
+vector<string> restoreIpAddresses(string s) {
+    backtracking(s, 0, 0);
+    return res;
+}
+
+
 /*
 剑指offer 38.字符串的全排列 有重复 中等
 */
@@ -113,6 +162,39 @@ public:
         return res;
     }
 };
+
+/*
+39、组合总和   无重复数字，可重复选取
+给定一个无重复元素的数组 candidates 和一个目标数 target ，
+找出 candidates 中所有可以使数字和为 target 的组合。
+candidates 中的数字可以无限制重复被选取。
+
+输入：candidates = [2,3,6,7], target = 7,
+所求解集为：
+[[7],
+[2,2,3]]
+*/
+vector<vector<int> > res;
+vector<int> path;
+void backtracking(vector<int>& candidates, int startindex, int sum, int target){
+    if(sum > target) return;
+    if(sum == target){
+        res.push_back(path);
+        return;
+    }
+    for(int i = startindex; i < candidates.size(); i++){
+        sum += candidates[i];
+        path.push_back(candidates[i]);
+        backtracking(candidates, i, sum, target);
+        sum -= candidates[i];
+        path.pop_back();
+    }
+}
+vector<vector<int> > combinationSum(vector<int>& candidates, int target) {
+    backtracking(candidates, 0, 0, target);
+    return res;
+}
+
 
 /*
 40.加起来和为目标值的组合 中等 去重操作
