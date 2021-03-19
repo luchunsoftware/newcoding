@@ -8,8 +8,9 @@ using namespace std;
 
 struct TreeNode {
  	int val;
- 	struct TreeNode *left;
-	struct TreeNode *right;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
 };
 /*
 二叉树的前序、中序和后序遍历（递归和迭代）
@@ -336,5 +337,51 @@ vector<vector<int> > pathSum(TreeNode* root, int sum){
 路径和 是路径中各节点值的总和。
 给你一个二叉树的根节点 root ，返回其最大路径和 。
 */
+int maxSum = INT_MIN;
+int dfs(TreeNode* root){
+    if(!root) return 0;
+    int left = dfs(root -> left);
+    int right = dfs(root -> right);
+    int cur = root -> val;
+    if(left > 0) cur += left;
+    if(right > 0) cur += right;
+    maxSum = max(maxSum, cur);
+    //此处返回的是max(左+中，右+中, 中)，左+右+中不满足题意
+    return max(root -> val, max(left, right) + root -> val);
+}
+int maxPathSum(TreeNode* root) {
+    dfs(root);
+    return maxSum;
+}
 
+/*
+重建二叉树
+已知前序遍历结果和中序遍历结果，还原这棵二叉树
+ */
+class Solution {
+public:
+    TreeNode* reConstructBinaryTree(vector<int> pre,vector<int> in) {
+        return help(pre, 0, pre.size(), in, 0, in.size());
+    }
+    TreeNode* help(vector<int>& pre, int prestart, int preend, vector<int>& in, int instart, int inend){
+        if(preend - prestart == 0) return nullptr;
+        int rootvalue = pre[prestart];
+        TreeNode* root = new TreeNode(rootvalue);
+        if(preend - prestart == 1) return root;
+        int index;
+        for(index = instart; index < inend; index++){
+            if(in[index] == rootvalue) break;
+        }
+        //切分中序
+        int leftinstart = instart, leftinend = index;
+        int rightinstart = index + 1, rightinend = inend;
+        //切分前序
+        int leftprestart = prestart + 1, leftpreend = prestart + 1 + index - instart;
+        int rightprestart = leftpreend, rightpreend = preend;
+        
+        root -> left = help(pre, leftprestart, leftpreend, in, leftinstart, leftinend);
+        root -> right = help(pre, rightprestart, rightpreend, in, rightinstart, rightinend);
+        return root;
+    }
+};
 
