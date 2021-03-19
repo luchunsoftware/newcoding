@@ -29,6 +29,71 @@ public:
 };
 
 /*
+最小的k个数
+*/
+vector<int> GetLeastNumbers_Solution(vector<int> input, int k) {
+    vector<int> res;
+    if(input.size() == 0 || k <= 0 || k > input.size()) return res;
+    int start = 0, end = input.size() - 1;
+    while(start < end){
+        int mid = partition(input, start, end);
+        if(mid == k) break;
+        else if(mid < k) start = mid + 1;
+        else{
+            end = mid - 1;
+        }
+    }
+    for(int i = 0; i < k; i++){
+        res.push_back(input[i]);
+    }
+    return res;
+}
+int partition(vector<int>& arr,int low, int high){
+    int pivot = arr[low];
+    while(low < high){
+        while(low < high && arr[high] >= pivot) high--;
+        arr[low] = arr[high];
+        while(low < high && arr[low] <= pivot) low++;
+        arr[high] = arr[low];
+    }
+    arr[low] = pivot;
+    return low;
+}
+
+/*
+寻找第K大的数
+*/
+class Solution {
+public:
+    int findKth(vector<int>& arr, int n, int K) {
+        int low = 0, high = n - 1;
+        K = n - K;
+        while(true){
+            int m = partition(arr, low, high);
+            if(m == K) return arr[K];
+            else if(m > K){
+                high = m - 1;
+            }else{
+                low = m + 1;
+            }
+        }
+        return -1;
+    }
+    int partition(vector<int>& arr, int low, int high){
+        int pivot = arr[low];
+        while(low < high){
+            while(low < high && arr[high] >= pivot) high--;
+            arr[low] = arr[high];
+            while(low < high && arr[low] <= pivot) low++;
+            arr[high] = arr[low];
+        }
+        arr[low] = pivot;
+        return low;
+    }
+};
+
+
+/*
 快排
 */
 class Solution{
@@ -55,3 +120,4 @@ class Solution{
         return low;
     }
 };
+

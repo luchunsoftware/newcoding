@@ -66,6 +66,34 @@ vector<vector<int> > threeSum(vector<int>& nums) {
 }
 
 /*
+16.最接近的三数之和
+给定一个包括 n 个整数的数组 nums 和 一个目标值 target。
+找出 nums 中的三个整数，使得它们的和与 target 最接近。返回这三个数的和。
+假定每组输入只存在唯一答案。
+*/
+int threeSumClosest(vector<int>& nums, int target){
+    sort(nums.begin(), nums.end());
+    int res = nums[0] + nums[1] + nums[2];
+    int value = abs(res - target);
+    int sum;
+    for(int i = 0; i < nums.size(); ++i){
+        int l = i + 1;
+        int r = nums.size() - 1; 
+        while(l < r) {
+            sum = nums[i] + nums[l] + nums[r];
+            if(sum > target) --r;
+            else if(sum < target) ++l;
+            else return sum;
+            if(abs(sum - target) < value){
+                res = sum;
+                value = abs(sum - target);
+            }
+        }
+    }
+    return res;
+}
+
+/*
 128.最长连续序列
 给定一个未排序的整数数组 nums ，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。
 */

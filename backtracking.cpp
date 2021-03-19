@@ -1,5 +1,6 @@
 /*
 剑指offer 
+17.电话号码的字母组合
 93. 数字字符串转IP地址
 38. 字符串的全排列 有重复 中等 去重
 46. 全排列 无重复数字 中等
@@ -12,8 +13,37 @@
 #include<iostream>
 #include<vector>
 #include<unordered_set>
+#include<string>
 
 using namespace std;
+
+/*
+17.电话号码的字母组合
+给定一个仅包含数字 2-9 的字符串，返回所有它能表示的字母组合。答案可以按 任意顺序 返回。
+给出数字到字母的映射如下（与电话按键相同）。注意 1 不对应任何字母。
+*/
+vector<string> board = { "", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz" };
+vector<string> res;
+string path;
+void backtracking(string digits, int startIndex){
+    if(path.size() == digits.size()){
+        res.push_back(path);
+        return;
+    }
+    int num = digits[startIndex] - '0';
+    for(int i = 0; i < board[num].size();i++){
+        path.push_back(board[num][i]);
+        backtracking(digits, startIndex + 1);
+        path.pop_back();
+    }            
+}
+vector<string> letterCombinations(string digits) {
+    if(digits.size() == 0) return res;
+    backtracking(digits, 0);
+    return res;
+}
+
+
 /*
 93.数字字符串转ip地址
 
