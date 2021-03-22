@@ -162,6 +162,76 @@ public:
 };
 
 /*
+23、合并k个已排序的链表
+合并 k个已排序的链表并将其作为一个已排序的链表返回。分析并描述其复杂度。 
+*/
+// 合并两个有序链表
+ListNode* merge(ListNode* p1, ListNode* p2){
+    if(!p1) return p2;
+    if(!p2) return p1;
+    if(p1->val <= p2->val){
+        p1->next = merge(p1->next, p2);
+        return p1;
+    }else{
+        p2->next = merge(p1, p2->next);
+        return p2;
+    }
+}
+
+ListNode* mergeKLists(vector<ListNode*>& lists) {
+    if(lists.size() == 0) return nullptr;
+    ListNode* head = lists[0];
+    for(int i = 1; i<lists.size(); ++i){
+        if(lists[i]) head = merge(head, lists[i]);
+    }
+    return head;  
+}
+
+/*
+148、排序链表
+给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。
+
+进阶：
+你可以在 O(n log n) 时间复杂度和常数级空间复杂度下，对链表进行排序吗？
+*/
+ListNode * sortList(ListNode * head){
+    return  (head == NULL)? NULL: mergeSort(head);
+}
+ListNode * findMid(ListNode * head){
+    ListNode * slow = head;
+    ListNode * fast = head;
+    ListNode * pre = NULL;
+    while (fast && fast->next){
+        pre = slow;
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    pre->next = NULL;
+    return slow;
+}
+
+ListNode * mergeTwoLists(ListNode * l1, ListNode * l2){
+    if(l1 == NULL) return l2;
+    if(l2 == NULL) return l1;
+
+    if(l1->val < l2->val){
+        l1->next = mergeTwoLists(l1->next,l2);
+        return l1;
+    }else{
+        l2->next = mergeTwoLists(l1,l2->next);
+        return l2;
+    }
+}
+
+ListNode * mergeSort(ListNode * head){
+    if(head->next == NULL) return head;
+    ListNode * mid = findMid(head);
+    ListNode * l1 = mergeSort(head);
+    ListNode * l2 = mergeSort(mid);
+    return mergeTwoLists(l1, l2);
+}
+
+/*
 栈先存储，逐个相加，cnt储存进位
 两个链表生成相加链表
 假设链表中每一个节点的值都在 0 - 9 之间，那么链表整体就可以代表一个整数。

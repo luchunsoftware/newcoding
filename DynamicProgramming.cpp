@@ -12,19 +12,40 @@ using namespace std;
 dp[1] = 1, dp[2] = 2;
 dp[n] = dp[n - 1] + dp[n - 2];
 */
-class Solution {
-public:
-    int jumpFloor(int number) {
-        if(number <= 2) return number;
-        int a = 1, b = 2, c = 0;
-        for(int i = 3; i <= number; i++){
-            c = a + b;
-            a = b;
-            b = c;
-        }
-        return c;
+int jumpFloor(int num) {
+    if(num <= 2) return num;
+    int a = 1, b = 2, c = 0;
+    for(int i = 3; i <= num; i++){
+        c = a + b;
+        a = b;
+        b = c;
     }
-};
+    return c;
+}
+
+/*
+改进版 跳台阶 不能连着两次跳2阶
+1、从 n-1 阶跳1阶跳上去
+2、从 n-2 阶跳2阶跳上去（同时 n-2 阶必须是跳 1 阶跳上去的）
+限制：从 n-2 阶跳 2 阶跳到 n 阶的 n-2 阶状态必须是从 n-3 阶跳1阶跳到 n-2 阶的
+f(n) 表示跳到第 n 阶的总方法数，用 g(n)表示最后一步跳一阶跳到第 n 阶的方法数
+f(n) = f(n - 1) + g(n - 2)
+g(n) = f(n - 1)              得到：f(n) = f(n - 1) + f(n - 3)
+*/
+int jumpFloor1(int n){
+    if (n <= 3) return n;
+    int n_3 = 1;
+    int n_2 = 2;
+    int n_1 = 3;
+    int res = 4;
+    for (int i = 4; i <= n; i++) {
+        res = n_1 + n_3;
+        n_3 = n_2;
+        n_2 = n_1;
+        n_1 = res;
+    }
+    return res;
+}
 
 /*
 53.最大子序和 
@@ -122,6 +143,19 @@ public:
             dp[i] = max(dp[i - 1], dp[i - 2] + nums[i]);
         }
         return dp[nums.size() - 1];
+    }
+    //优化空间复杂度为o(1)的做法
+    int rob1(vector<int>& nums) {
+        int size = nums.size();
+        if(size == 0) return 0;
+        if(size == 1) return nums[0];
+        int first = nums[0], second = max(nums[0], nums[1]);
+        for (int i = 2; i < size; i++) {
+            int temp = second;
+            second = max(first + nums[i], second);
+            first = temp;
+        }
+        return second;
     }
 };
 
