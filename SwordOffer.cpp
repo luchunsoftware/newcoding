@@ -1086,6 +1086,31 @@ int countDigitOne(int n) {
 
 
 
+/*
+61、扑克牌中的顺子
+从扑克牌中随机抽5张牌，判断是不是一个顺子，
+即这5张牌是不是连续的。
+2～10为数字本身，A为1，J为11，Q为12，K为13，而大、小王为 0 ，
+可以看成任意数字。A 不能视为 14。
+
+哈希用于统计是否重复，重复则不是顺子（除开大小王），
+遇到王则跳过，遍历的时候统计最大和最小的数字，如果相差小于5，说明是顺子
+*/
+bool isStraight(vector<int>& nums) {
+    int map[14] = {0};
+    int minValue = 14, maxValue = -1;
+    for(int n : nums)
+    {
+        if(n == 0)  continue;
+        if(map[n] >= 1)    return false;
+        minValue = min(minValue,n);
+        maxValue = max(maxValue,n);
+        ++map[n];
+    }
+    return maxValue - minValue < 5;
+}
+
+
 
 /*
 输入一个正整数 target ，输出所有和为 target 的连续正整数序列（至少含有两个数）。
