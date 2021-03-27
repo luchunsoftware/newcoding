@@ -31,6 +31,27 @@ public:
 };
 
 /*
+24、两两交换链表中的节点
+给定一个链表，两两交换其中相邻的节点，并返回交换后的链表。
+你不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。
+*/
+ListNode* swapPairs(ListNode* head) {
+    if(!head) return head;
+    ListNode* pre = head;
+    ListNode* cur = head -> next;
+    while(cur -> next){
+        ListNode* node = cur -> next;
+        cur -> next = pre;
+        pre -> next = node;
+
+        pre = node;
+        cur = node -> next;
+    }
+    return head;
+}
+
+
+/*
 按k个一组翻转链表 困难
 */
 class Solution {
@@ -75,22 +96,18 @@ public:
 /*
 剑指offer22.链表中倒数第k个节点 简单
 */
-class Solution {
-public:
-    ListNode* getKthFromEnd(ListNode* head, int k) {
-        ListNode* fast = head;
-        ListNode* slow = head;
-        while(k--){
-            fast = fast -> next;
-        }
-        while(fast){
-            fast = fast -> next;
-            slow = slow -> next;
-        }
-        return slow;
+ListNode* getKthFromEnd(ListNode* head, int k) {
+    ListNode* fast = head;
+    ListNode* slow = head;
+    while(k--){
+        fast = fast -> next;
     }
-};
-
+    while(fast){
+        fast = fast -> next;
+        slow = slow -> next;
+    }
+    return slow;
+}
 
 /*
 19.删除倒数第n个节点 中等
@@ -299,18 +316,14 @@ public:
 
 /*
 两个链表的第一个公共节点 简单
-
 双指针 两个都走l1 + l2 + c步的时候，相遇
 */
-class Selation{
-public:
-    ListNode* get1stmeet(ListNode* l1,ListNode* l2){
-        ListNode* node1 = l1;
-        ListNode* node2 = l2;
-        while(node1 != node2){
-            node1 = node1 != nullptr ? node1 -> next : l2;
-            node2 = node2 != nullptr ? node2 -> next : l1;
-        }
-        return node1;
+ListNode* get1stmeet(ListNode* l1,ListNode* l2){
+    ListNode* node1 = l1;
+    ListNode* node2 = l2;
+    while(node1 != node2){
+        node1 = node1 != nullptr ? node1 -> next : l2;
+        node2 = node2 != nullptr ? node2 -> next : l1;
     }
-};
+    return node1;
+}

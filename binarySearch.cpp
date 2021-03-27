@@ -24,6 +24,9 @@ public:
     }
 };
 
+/*
+矩阵查找
+*/
 
 
 /*
@@ -220,6 +223,36 @@ public:
         }
     }
 };
+
+/*
+两次二分查找，找到第一个大于等于的数，和最后一个等于的数
+数字在升序数组中的个数
+统计一个数字在升序数组中出现的次数。
+*/
+int GetNumberOfK(vector<int>& data ,int k) {
+    int lbound = 0, rbound = 0;
+    int l = 0, r = data.size() - 1;
+    while(l <= r){
+        int m = l + (r - l) / 2;
+        if(data[m] >= k){
+            r = m - 1;
+        }else{
+            l = m + 1;
+        }
+    }
+    lbound = l;
+    l = 0, r = data.size() - 1;
+    while( l <= r){
+        int m = l + (r - l) / 2;
+        if(data[m] > k){
+            r = m - 1;
+        }else{
+            l = m + 1;
+        }
+    }
+    rbound = l;
+    return rbound - lbound;
+}
 
 
 
